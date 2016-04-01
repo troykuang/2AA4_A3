@@ -210,6 +210,20 @@ public class Controller {
 			// If the players haven't finished placing their discs, currentState goes back to 1, otherwise it changes to 2 where players move their discs in turn
 			// If the player click on his own disc/ a point with disc, currenState remains in 4.
 			String colorO = laModel.getOppositeColour();
+			int oppoDiscs = 0;
+			if (colorO == "Red"){
+				oppoDiscs = laModel.totalRed;
+			}
+			else if (colorO == "Blue"){
+				oppoDiscs = laModel.totalBlue;
+			}
+			if ((laModel.currentBoard.Points[y][x].color == colorO) && (oppoDiscs == 3)){
+				laModel.resetA(y,x);
+				leView.undrawDisc(x,y);
+				laModel.remove(colorO);
+				checkWins();
+				break;			
+			}
 			if ((laModel.currentBoard.Points[y][x].color == colorO) && (!laModel.inMills(y,x))){
 				//// If the disc the user clicks on is in opposite color and it's not in a mill, then that disc is removed. 
 				laModel.resetA(y,x);
@@ -240,7 +254,12 @@ public class Controller {
 				leView.draw(laModel.getPlayerColour(),x,y);
 				laModel.placeDisc(laModel.getPlayerColour(),y, x);
 			}
+		case 6: // End of the game no more click action
+			currentState = 6;
+			break;
+
 		}
+		
 	}
 	
 	public void loadFile(ArrayList<String> x){	//the arraylist is of all the points that need to be put on to the board graphically
@@ -326,11 +345,14 @@ public class Controller {
 			//System.out.println("RED WINS");
 			// view to display "red wins"
 			leView.changeState(2);		//6 = red wins
+			currentState = 6;
 		}
 		else if (laModel.totalRed == 2){
 			//System.out.println("BLUE WINS");
 			//  view to display "BLUE wins"
 			leView.changeState(3);		//6 = red wins
+			currentState = 6;
+			
 		}
 		else{
 			//System.out.println("GAME IN PROGRESS");

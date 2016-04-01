@@ -19,8 +19,8 @@ public class Model {		//this will hold the logic of the game
 	public Board currentBoard;
 	public int redDiscs = 6; 	// The number of red discs that are remained to be placed on the board.
 	public int blueDiscs = 6;	// The number of blue discs that are remained to be placed on the board.
-	public int totalRed = 6; // The total number of red discs 
-	public int totalBlue = 6; // The total number of blue discs 
+	public int totalRed = 6; // The total number of red discs remained on the board
+	public int totalBlue = 6; // The total number of blue discs remained on the board
 	private ArrayList<String> mills = new ArrayList<String>(); // An ArrayList that holds all the coordinates in the mills 
 	
 	
