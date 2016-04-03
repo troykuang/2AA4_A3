@@ -378,8 +378,9 @@ public class Model {		//this will hold the logic of the game
 		//A
 		for (int i = 0;i < 8;i++){
 			ArrayList<String> current = LineInfo.get(i);
-			if ((current.get(0).equals("2") ||current.get(1).equals("2")) && (!current.get(2).equals(null))){
-				nextMoves.add(current.get(2));
+			if ((current.get(0).equals("2") ||current.get(1).equals("2")) && (current.size()>2)){
+				if (!nextMoves.contains(current.get(2)))
+					nextMoves.add(current.get(2));
 			}
 		}
 		if (nextMoves.isEmpty()){
@@ -388,14 +389,22 @@ public class Model {		//this will hold the logic of the game
 				ArrayList<String> current = LineInfo.get(i);
 				if (AIcolor.equals("Red")){
 					if ((current.get(0).equals("1")) && ((current.get(1).equals("0")))){
-						nextMoves.add(current.get(2));
-						nextMoves.add(current.get(3));
+						if (!nextMoves.contains(current.get(2))){
+							nextMoves.add(current.get(2));
+						}
+						if (!nextMoves.contains(current.get(3))){
+							nextMoves.add(current.get(3));
+						}
 					}
 				}
 				else if (AIcolor.equals("Blue")){
 					if ((current.get(0).equals("0")) && ((current.get(1).equals("1")))){
-						nextMoves.add(current.get(2));
-						nextMoves.add(current.get(3));
+						if (!nextMoves.contains(current.get(2))){
+							nextMoves.add(current.get(2));
+						}
+						if (!nextMoves.contains(current.get(3))){
+							nextMoves.add(current.get(3));
+						}
 					}
 				}
 			}
@@ -404,16 +413,24 @@ public class Model {		//this will hold the logic of the game
 				for (int i = 0;i < 8;i++){
 					ArrayList<String> current = LineInfo.get(i);
 					if ((current.get(0).equals("0") && current.get(1).equals("0"))){
-						nextMoves.add(current.get(2));
-						nextMoves.add(current.get(3));
-						nextMoves.add(current.get(4));
+						if (!nextMoves.contains(current.get(2))){
+							nextMoves.add(current.get(2));
+						}
+						if (!nextMoves.contains(current.get(3))){
+							nextMoves.add(current.get(3));
+						}
+						if (!nextMoves.contains(current.get(4))){
+							nextMoves.add(current.get(4));
+						}
 					}
 				}
 				if (nextMoves.isEmpty()){
 					for (int i = 0;i < 8;i++){
 						ArrayList<String> current = LineInfo.get(i);
 						if ((current.get(0).equals("1") && current.get(1).equals("1"))){
-							nextMoves.add(current.get(2));
+							if (!nextMoves.contains(current.get(2))){
+								nextMoves.add(current.get(2));
+							}
 						}
 					}
 					return nextMoves;
