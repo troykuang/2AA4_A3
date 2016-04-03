@@ -57,10 +57,13 @@ public class Controller {
 		int N = 6;
 		gameTile = ((N/3)*2)+1;
 		laModel.getfirstPlayer();	//to ranomize the first player
+		laModel.AIcolor = laModel.getPlayerColour();
 		leView.newGame(gameTile); //# of mens morris
 		laModel.createBoard(N);		//creating a fresh board with no placed discs
 		//laModel.currentBoard.showBoards();	
-		currentState =1;			//setting the state (alternates players)
+		currentState = 71;			//setting the state (alternates players)
+		inputClick(0,0);
+		
 
 	}
 	
@@ -254,11 +257,68 @@ public class Controller {
 				leView.draw(laModel.getPlayerColour(),x,y);
 				laModel.placeDisc(laModel.getPlayerColour(),y, x);
 			}
-		case 6: // End of the game no more click action
+		case 6: // A trapping state. The end of the game no more click actions
 			currentState = 6;
 			break;
-
+		 
+		case 7: // User places discs
+			// If a mill is formed during this procedure, currentState changes to 4
+			// If both player have already placed 6 discs, currentState changes to 2
+			// Otherwise, players alternate and stay in currentState 1.
+			if (laModel.currentBoard.Points[y][x].discCounter ==0){
+				leView.draw(laModel.getPlayerColour(),x,y);			//drawing it on the board
+				laModel.placeDisc(laModel.getPlayerColour(),y, x);	//logically placing it in the model as well
+				if (laModel.checkMills(y,x)){						//check if there is a mill
+					currentState = 10;					// TODO: change the state if there is 
+					checkWins();						//to update the progress graphically and in the logic
+					break;
+				}
+			}
+			else{ // click on a point where is invalid to place the disc, so it gets back
+				currentState = 7;				
+				break;
+			}
+			
+			
+			if ((laModel.redDiscs == 0) && (laModel.blueDiscs == 0)){ // If both player have already placed 6 discs, currentState changes to 2
+				laModel.switchColor();	
+				leView.playerChange();//this is changing colours
+				currentState = 71; // AI places a disc
+				checkWins();
+				break;
+			}
+			else{ // Otherwise, players alternate and stay in currentState 1.
+				laModel.switchColor();
+				leView.playerChange();
+				currentState = 1;
+				checkWins();
+				break;
+				
+			}
+		case 71: // AI places discs
+			ArrayList<String> AInextMoves = laModel.AInextMoves();
+			
+			
 		}
+			
+			
+			
+			
+//		case 2: // Show valid next moves
+//			// If the player clicks on his own discs, the program shows valid next moves using dashed circles.
+//			// 		And it saves all valid next moves to ArrayList nextMoves for later use.
+//			//		Also, in currentState 2, current x,y is saved to nowX, nowY. So in currentState 3 we'll know which disc to move
+//			// Otherwise, currentStates remains in 2.
+//			while (dashedCircles!=0){ // Clean up all the dashed circles from the last click.
+//				leView.removeDashed();
+//				dashedCircles --;
+//			}
+//			String color = laModel.getPlayerColour();
+//			if (laModel.currentBoard.Points[y][x].color == color){
+//				// If the player clicks on his own discs, the program show valid next moves using dashed circles.
+	
+		
+	
 		
 	}
 	
@@ -360,6 +420,7 @@ public class Controller {
 			leView.changeState(1);		//6 = red wins
 		}
 	}
+	
 	
 
 }
