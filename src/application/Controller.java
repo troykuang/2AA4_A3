@@ -62,16 +62,13 @@ public class Controller {
 		leView.newGame(gameTile); //# of mens morris
 		laModel.createBoard(N);		//creating a fresh board with no placed discs
 		//laModel.currentBoard.showBoards();	
-		currentState = 1;			//setting the state (alternates players)
+		currentState = 71;			//setting the state (alternates players)
 //		while (!(laModel.totalBlue == 2 && laModel.totalRed == 2)){
 //			if (currentState>20){
 //				inputClick(0,0);
 //			}
 ////		}
-//		inputClick(0,0);
-//		
-		
-
+		inputClick(0,0);
 	}
 	
 	public void play(){			//for when the board has been manually loaded or if we are loading from file
@@ -318,6 +315,8 @@ public class Controller {
 					leView.playerChange();
 					currentState = 71;
 					checkWins();
+					leaveSwitch = false;
+					break;
 				}
 			case 71: // AI places discs
 				ArrayList<String> AInextMoves = laModel.AInextMoves();
@@ -328,10 +327,11 @@ public class Controller {
 				int coorY = Integer.parseInt(a[1]);
 				leView.draw(laModel.getPlayerColour(),coorY,coorX);			//drawing it on the board
 				laModel.placeDisc(laModel.getPlayerColour(),coorX, coorY);	//logically placing it in the model as well
-				if (laModel.checkMills(coorY,coorX)){						//check if there is a mill
-					currentState = 101;					// TODO: change the state if there is 
+				if (laModel.checkMills(coorX,coorY)){						//check if there is a mill
+					currentState = 101;					
 					checkWins();						//to update the progress graphically and in the logic
 					leaveSwitch = false;
+					break;
 				}
 				
 				if ((laModel.redDiscs == 0) && (laModel.blueDiscs == 0)){ // If both player have already placed 6 discs, currentState changes to 8
@@ -339,6 +339,7 @@ public class Controller {
 					leView.playerChange();//this is changing colours
 					currentState = 8; // Player places a disc
 					checkWins();
+					leaveSwitch = true;
 					break;
 				}
 				else{ // Otherwise, players alternate and stay in currentState 7 (player's turn to place).
@@ -346,6 +347,7 @@ public class Controller {
 					leView.playerChange();
 					currentState = 7;
 					checkWins();
+					leaveSwitch = true;
 					break;
 			}
 			case 8: // Show valid next moves
@@ -372,11 +374,13 @@ public class Controller {
 					// Also, in currentState 2, current x,y is saved to nowX, nowY. So in currentState 3 we'll know which disc to move
 					nowX = y;
 					nowY = x;
+					leaveSwitch = true;
 					break;
 				}
 				else{
 					currentState = 8;
 					checkWins();
+					leaveSwitch = true;
 					break;
 				}
 			case 9: // Move a disc from point A to point B
@@ -395,21 +399,26 @@ public class Controller {
 					if (laModel.checkMills(y,x)){ 	// And check if a mill is formed due to this move, if so, currentState changes to 10.
 						currentState = 10; 
 						checkWins();
+						leaveSwitch = true;
 						break;
 					} //  If not, currentState --> AI MOVES DISCS
 					currentState = 91;
 					checkWins();
 					laModel.switchColor();
 					leView.playerChange();
+					leaveSwitch = false;
+					break;
 				}
 				else{ // If B is not in valid next moves, currentState changes back to 2, where user can find valid next moves again.
 					currentState =8 ;
 					checkWins();
+					leaveSwitch = true;
 					break;
 				}
 			case 91:
 				System.out.println("AI MOVES SHIT");
 				currentState = 6;
+				leaveSwitch = true;
 				break;
 			case 10: // A mill is formed, remove an opponent's disc.
 				// If the disc the user clicks on is in opposite color and it's not in a mill, then that disc is removed. 
@@ -428,6 +437,7 @@ public class Controller {
 					leView.undrawDisc(x,y);
 					laModel.remove(colorOAI);
 					checkWins();
+					leaveSwitch = true;
 					break;			
 				}
 				if ((laModel.currentBoard.Points[y][x].color == colorOAI) && (!laModel.inMills(y,x))){
@@ -441,15 +451,20 @@ public class Controller {
 						// If the players haven't finished placing their discs, currentState goes back to 1,
 						currentState = 71;
 						checkWins();
+						leaveSwitch = false;
+						break;
 					}
 					else{ // otherwise it changes to 2 where players move their discs in turn
 						currentState = 91;
 						checkWins();
+						leaveSwitch = false;
+						break;
 					}	
 				}
 				else{ // If the player click on his own disc/ a point with disc, currenState remains in 4.
 					currentState = 10;
 					checkWins();
+					leaveSwitch = true;
 					break;
 				}
 				
