@@ -433,9 +433,7 @@ public class Model {		//this will hold the logic of the game
 							}
 						}
 					}
-					return nextMoves;
-					
-					
+					return nextMoves;				
 				}
 				else return nextMoves;
 			}
@@ -443,8 +441,7 @@ public class Model {		//this will hold the logic of the game
 		}
 		else return nextMoves;
 	}
-	
-		
+
 	
 	
 	

@@ -245,6 +245,19 @@ public class Board {
 		return allMills;
 	}
 	
+	public ArrayList<String> allXcolorDiscs(String color){
+		ArrayList<String> allAIpoints = new ArrayList<String>();
+		for (int i = 0; i < this.length; i++) {
+			for (int j = 0; j < this.length; j++) {
+				if ((Points[i][j].validity) && Points[i][j].color.equals(color)) {
+					allAIpoints.add((Points[i][j].coor));
+				}
+			}
+		}
+				
+		return allAIpoints;
+	}
+	
 	/* THIS PART IS FOR RESET BUTTON AND PROB SHOULD BE MOVED TO CONTROLLER LATER
 	 public static void clearBoard(){
 		// keep valid points and connections but clear discCount and color

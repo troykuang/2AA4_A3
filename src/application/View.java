@@ -1,7 +1,10 @@
 package application;
 
+import java.time.Duration;
 import java.util.ArrayList;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.*;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -298,15 +301,15 @@ public class View extends Application {
 		System.out.println(i);			//check the state
 		switch (i){
 		case 1:
-			System.out.println("I'M IN CHANGESTATE 1");
+//			System.out.println("I'M IN CHANGESTATE 1");
 			status.setText("In PROGRESS");	//tell the player the game is in progress
 			break;
 		case 2:
-			System.out.println("I'M IN CHANGESTATE 2");
+//			System.out.println("I'M IN CHANGESTATE 2");
 			status.setText("Red Wins!");		//when red wins
 			break;
 		case 3:
-			System.out.println("I'M IN CHANGESTATE 3");
+//			System.out.println("I'M IN CHANGESTATE 3");
 			status.setText("Blue Wins!");		//when blue wins
 			break;
 		}
@@ -479,8 +482,12 @@ public class View extends Application {
 
 	public void undrawDisc(int i,int j){			//getting rid of disc
 		buttons[i][j].setFill(Color.TRANSPARENT);	//just reFill it transparent
+	
 	}
 	
+	
+	
+
 	public void exit(){						//to close the whole stage if they want to exit
 		Stage st = (Stage) (leStage.getScene().getWindow());
 		resetLoad();						//we also need to reset it, in case they open another window, we dont want the game pieces to be there still

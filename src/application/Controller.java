@@ -20,6 +20,7 @@ public class Controller {
 	public static ArrayList<String> nextMoves;	//to show next moves, the dashed circles will highlight
 	public static int nowX;	
 	public static int nowY;
+	private static String AIcolor;
 	
 	static Model laModel = new Model();	//instantiate the model in order to store the placements 
 	static View leView = new View();		//view object in order to change the view
@@ -59,16 +60,13 @@ public class Controller {
 		gameTile = ((N/3)*2)+1;
 		laModel.getfirstPlayer();	//to ranomize the first player
 		laModel.AIcolor = laModel.getPlayerColour();
+		this.AIcolor = laModel.getPlayerColour();
 		leView.newGame(gameTile); //# of mens morris
 		laModel.createBoard(N);		//creating a fresh board with no placed discs
 		//laModel.currentBoard.showBoards();	
 		currentState = 71;			//setting the state (alternates players)
-//		while (!(laModel.totalBlue == 2 && laModel.totalRed == 2)){
-//			if (currentState>20){
-//				inputClick(0,0);
-//			}
-////		}
 		inputClick(0,0);
+//		currentState = 1;
 	}
 	
 	public void play(){			//for when the board has been manually loaded or if we are loading from file
@@ -110,16 +108,20 @@ public class Controller {
 	public void resetLoad(){		//resetting the logic in the model as well as the board graphically
 		changeDiscColourRed();		//going back to red (which is the default)
 		laModel.createBoard(N);		//resetting the model logic, no discs placed
-		
 		leView.resetLoad();			//resetting the graphical board as well
+		currentState = 71;
 	}
 
 	public static void inputClick(int x, int y){ //when a circle mouse click listener is clicked it is redirected here
 		//System.out.println("mouse clicked at circle: "+y+" "+x);
 		//System.out.println("currentState is "+ currentState);
 		//laModel.currentBoard.showBoards();
+		
+		
 		boolean leaveSwitch = false;
 		while (leaveSwitch == false){
+			
+			System.out.println("I'M IN STATE:"+currentState);
 			switch (currentState){
 			case 1: // Two users put their discs in turn 	
 				// If a mill is formed during this procedure, currentState changes to 4
@@ -292,22 +294,25 @@ public class Controller {
 						currentState = 10;					// TODO: change the state if there is 
 						checkWins();						//to update the progress graphically and in the logic
 						leaveSwitch = true;
+						laModel.currentBoard.showBoards();
 						break;
 					}
 				}
 				else{ // click on a point where is invalid to place the disc, so it gets back
 					currentState = 7;	
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 				
 				
-				if ((laModel.redDiscs == 0) && (laModel.blueDiscs == 0)){ // If both player have already placed 6 discs, currentState changes to 2
+				if ((laModel.redDiscs <= 0) && (laModel.blueDiscs <= 0)){ // If both player have already placed 6 discs, currentState changes to 2
 					laModel.switchColor();	
 					leView.playerChange();//this is changing colours
 					currentState = 91; // AI moves a disc
 					checkWins();
 					leaveSwitch = false;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 				else{ // Otherwise, players alternate and stay in currentState 1.
@@ -316,6 +321,7 @@ public class Controller {
 					currentState = 71;
 					checkWins();
 					leaveSwitch = false;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 			case 71: // AI places discs
@@ -331,15 +337,17 @@ public class Controller {
 					currentState = 101;					
 					checkWins();						//to update the progress graphically and in the logic
 					leaveSwitch = false;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 				
-				if ((laModel.redDiscs == 0) && (laModel.blueDiscs == 0)){ // If both player have already placed 6 discs, currentState changes to 8
+				if ((laModel.redDiscs <= 0) && (laModel.blueDiscs <= 0)){ // If both player have already placed 6 discs, currentState changes to 8
 					laModel.switchColor();	
 					leView.playerChange();//this is changing colours
 					currentState = 8; // Player places a disc
 					checkWins();
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 				else{ // Otherwise, players alternate and stay in currentState 7 (player's turn to place).
@@ -348,6 +356,7 @@ public class Controller {
 					currentState = 7;
 					checkWins();
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 			}
 			case 8: // Show valid next moves
@@ -375,12 +384,14 @@ public class Controller {
 					nowX = y;
 					nowY = x;
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 				else{
 					currentState = 8;
 					checkWins();
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 			case 9: // Move a disc from point A to point B
@@ -400,6 +411,7 @@ public class Controller {
 						currentState = 10; 
 						checkWins();
 						leaveSwitch = true;
+						laModel.currentBoard.showBoards();
 						break;
 					} //  If not, currentState --> AI MOVES DISCS
 					currentState = 91;
@@ -407,19 +419,69 @@ public class Controller {
 					laModel.switchColor();
 					leView.playerChange();
 					leaveSwitch = false;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 				else{ // If B is not in valid next moves, currentState changes back to 2, where user can find valid next moves again.
-					currentState =8 ;
+					currentState = 8 ;
 					checkWins();
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 				}
 			case 91:
-				System.out.println("AI MOVES SHIT");
-				currentState = 6;
-				leaveSwitch = true;
-				break;
+				System.out.println("AI MOVES HIS OWN PIECES");
+				ArrayList<String> allAIdiscs = laModel.currentBoard.allXcolorDiscs(AIcolor); 
+				ArrayList<String> currentValidNextMoves = new ArrayList<String>();
+				int chosenPoint, currentX = 0, currentY=0;
+				int nextMoves = 0;
+				
+				ArrayList<String> allPossibleNextMoves = new ArrayList<String>();
+				for (String currentCoor : allAIdiscs){
+					String[] c = currentCoor.split(",");
+					currentX = Integer.parseInt(c[0]);
+					currentY = Integer.parseInt(c[1]);
+					allPossibleNextMoves.addAll(laModel.showValidMoves(currentX, currentY));
+				}
+				if (allPossibleNextMoves.isEmpty()){
+					currentState = 12;
+					leaveSwitch = false;
+					checkWins("a");
+					break;			
+				}
+				else{
+					while (nextMoves == 0){ // HAVE TO FIND A WAY TO FIND ALL THE POSSIBLE MOVES AND IF THAT LIST IS EMPTY THEN GAME DRAWN
+
+						chosenPoint = randomInteger(0,allAIdiscs.size()-1);
+						String[] c = allAIdiscs.get(chosenPoint).split(",");
+						currentX = Integer.parseInt(c[0]);
+						currentY = Integer.parseInt(c[1]);
+						currentValidNextMoves = laModel.showValidMoves(currentX, currentY);
+						nextMoves = currentValidNextMoves.size();
+					}
+					// Chosen point currentX, currentY
+					int desIndex = randomInteger(0,currentValidNextMoves.size()-1);
+					String desCoor = currentValidNextMoves.get(desIndex);
+					String[] d = desCoor.split(",");
+					int nextX = Integer.parseInt(d[0]);
+					int nextY = Integer.parseInt(d[1]);
+					System.out.println("AI IS moving"+currentX+","+currentY+"to "+nextX+","+nextY);
+					moveA2B(currentX,currentY,nextX,nextY); 
+					if (laModel.checkMills(nextX,nextY)){ 	// And check if a mill is formed due to this move, if so, currentState changes to 10.
+						currentState = 101; 
+						checkWins();
+						leaveSwitch = false;
+						laModel.currentBoard.showBoards();
+						break;
+					} //  If not, currentState --> AI MOVES DISCS
+					currentState = 8;
+					checkWins();
+					laModel.switchColor();
+					leView.playerChange();
+					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
+					break;				
+				}
 			case 10: // A mill is formed, remove an opponent's disc.
 				// If the disc the user clicks on is in opposite color and it's not in a mill, then that disc is removed. 
 				// If the players haven't finished placing their discs, currentState goes back to 1, otherwise it changes to 2 where players move their discs in turn
@@ -438,6 +500,7 @@ public class Controller {
 					laModel.remove(colorOAI);
 					checkWins();
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;			
 				}
 				if ((laModel.currentBoard.Points[y][x].color == colorOAI) && (!laModel.inMills(y,x))){
@@ -452,12 +515,14 @@ public class Controller {
 						currentState = 71;
 						checkWins();
 						leaveSwitch = false;
+						laModel.currentBoard.showBoards();
 						break;
 					}
 					else{ // otherwise it changes to 2 where players move their discs in turn
 						currentState = 91;
 						checkWins();
 						leaveSwitch = false;
+						laModel.currentBoard.showBoards();
 						break;
 					}	
 				}
@@ -465,12 +530,72 @@ public class Controller {
 					currentState = 10;
 					checkWins();
 					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
 					break;
 				}
-				
-				
+			case 101:
+				String playerColor = laModel.getOppositeColour();
+				ArrayList<String> allPlayerDiscs = laModel.currentBoard.allXcolorDiscs(playerColor);
+				ArrayList<String> canBeRemoved = new ArrayList<String>();
+				if (allPlayerDiscs.size() == 3){
+					String chosenDisc =  allPlayerDiscs.get(randomInteger(0, 2));
+					String[] chosenDiscL = chosenDisc.split(",");
+					int chosenDiscX = Integer.parseInt(chosenDiscL[0]);
+					int chosenDiscY = Integer.parseInt(chosenDiscL[1]);
+					laModel.resetA(chosenDiscX,chosenDiscY);
+					leView.undrawDisc(chosenDiscY,chosenDiscX);
+					laModel.remove(playerColor);
+					checkWins();
+					leaveSwitch = true;
+					laModel.currentBoard.showBoards();
+					break;			
+				}
+				else{
+					for (String currentPlayerCoor : allPlayerDiscs){
+						String[] e = currentPlayerCoor.split(",");
+						int currentPlayerCoorX = Integer.parseInt(e[0]);
+						int currentPlayerCoorY = Integer.parseInt(e[1]);
+						if (!laModel.inMills(currentPlayerCoorX, currentPlayerCoorY)){
+							canBeRemoved.add(currentPlayerCoor);
+						}
+					}
+					String chosenDisc =  allPlayerDiscs.get(randomInteger(0,canBeRemoved.size()-1));
+					String[] chosenDiscL = chosenDisc.split(",");
+					int chosenDiscX = Integer.parseInt(chosenDiscL[0]);
+					int chosenDiscY = Integer.parseInt(chosenDiscL[1]);
+					laModel.resetA(chosenDiscX,chosenDiscY);
+					leView.undrawDisc(chosenDiscY,chosenDiscX);
+					laModel.remove(playerColor);
+					laModel.switchColor();
+					leView.playerChange();//this is changed
+					if ((laModel.redDiscs > 0) || (laModel.blueDiscs  >0)){
+						// If the players haven't finished placing their discs, currentState goes back to 1,
+						currentState = 7;
+						checkWins();
+						leaveSwitch = true;
+						laModel.currentBoard.showBoards();
+						break;
+					}
+					else{ // otherwise it changes to 2 where players move their discs in turn
+						currentState = 9;
+						checkWins();
+						leaveSwitch = true;
+						laModel.currentBoard.showBoards();
+						break;
+					}
+			
+				}			
+			case 12:
+				System.out.println("GAME DRAWN");
+				currentState = 12;
+				leaveSwitch = true;
+				break;
 			}	
+		
+			
 		}
+		
+			
 	}
 	
 	public static int randomInteger(int min, int max) {
@@ -556,6 +681,11 @@ public class Controller {
 			saveGame();
 			play();	
 		}
+	}
+	
+	public static void checkWins(String a){
+		System.out.println("Game Drawn");
+		// leView
 	}
 	
 	public static void checkWins(){
